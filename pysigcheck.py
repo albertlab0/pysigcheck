@@ -272,7 +272,7 @@ def sigcheck_h(filepath, show_size=False):
     # File size info
     if show_size:
         file_size = os.path.getsize(filepath)
-        lines.append(f"\t{file_size} (0x{file_size:X})  bytes")
+        lines.append(f"{file_size} (0x{file_size:X})  bytes")
 
     # Compute file hashes (always)
     md5, sha1, sha256 = compute_hashes(filepath)
