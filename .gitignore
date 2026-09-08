@@ -3,3 +3,9 @@ __pycache__/
 *.spec
 dist/
 build/
+*~
+.*.un~
+
+# Regression sample collection. Never committed: it holds live malware samples
+# (and a manifest that is meaningless without them). See tests/README.md.
+tests/samples/
