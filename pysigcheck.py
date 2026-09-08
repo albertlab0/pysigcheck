@@ -240,15 +240,20 @@ def format_datetime(dt):
     return str(dt)
 
 
-def format_file_date(filepath):
-    """Get file modification date formatted like sigcheck."""
-    mtime = os.path.getmtime(filepath)
-    dt = datetime.fromtimestamp(mtime)
-    hour = dt.hour % 12
-    if hour == 0:
-        hour = 12
-    ampm = "AM" if dt.hour < 12 else "PM"
-    return f"{hour}:{dt.minute:02d} {ampm} {dt.month}/{dt.day}/{dt.year}"
+def format_link_date(filepath):
+    """Get PE link date (TimeDateStamp from COFF header) formatted like sigcheck."""
+    try:
+        pe = pefile.PE(filepath, fast_load=True)
+        timestamp = pe.FILE_HEADER.TimeDateStamp
+        pe.close()
+        dt = datetime.fromtimestamp(timestamp)
+        hour = dt.hour % 12
+        if hour == 0:
+            hour = 12
+        ampm = "AM" if dt.hour < 12 else "PM"
+        return f"{hour}:{dt.minute:02d} {ampm} {dt.month}/{dt.day}/{dt.year}"
+    except Exception:
+        return "n/a"
 
 
 def is_pe_file(filepath):
@@ -300,8 +305,8 @@ def sigcheck_h(filepath, show_size=False):
                 lines.append(f"\tSigning date:\t{signing_date}")
         else:
             lines.append(f"\tVerified:\tUnsigned")
-            file_date = format_file_date(filepath)
-            lines.append(f"\tFile date:\t{file_date}")
+            link_date = format_link_date(filepath)
+            lines.append(f"\tLink date:\t{link_date}")
 
         publisher = sig_info["publisher"] if sig_info["signed"] and sig_info["publisher"] else "n/a"
         company = ver_info["company"] if ver_info["company"] else "n/a"
